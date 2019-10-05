@@ -15,31 +15,26 @@ void menu::on_entry_point() {
   REGISTER_NOTIFICATIONS(title_font);
 
   // initialize the main window
-  ADD_WINDOW(vars::container["#window"], 50, 50, "Ruvi", 575, 450, fgui::external::key_code::KEY_HOME, title_font);
+  ADD_WINDOW(vars::container["#window"], 50, 50, "Ruvi for Counter-Strike: Global Offensive", 560, 450, fgui::external::key_code::KEY_HOME, title_font);
 
   // initialize the input system
   REGISTER_CURSOR(fgui::cursor_type::ARROW, fgui::input_state::UNLOCKED);
 
-  REGISTER_TAB(vars::tabs["#panel"], 7, 1, element_font, vars::container["#window"], -1);
+  REGISTER_TAB(vars::tabs["#tab_panel"], 7, 1, title_font, vars::container["#window"], -1);
 
-  ADD_TAB(vars::tabs["#panel"], "Aimbot"); {
-
-    ADD_GROUPBOX(vars::container["#groupbox"], 15, (25 + 15), "Groupbox", 280, 370, element_font, vars::container["#window"], 0, false, false, false) {
-    ADD_CONTROLLER(vars::container["#groupbox"], vars::tabs["#panel"]);
-
-    }
+  ADD_TAB(vars::tabs["#tab_panel"], "Aimbot"); {
   }
 
-  ADD_TAB(vars::tabs["#panel"], "Visuals"); {
+  ADD_TAB(vars::tabs["#tab_panel"], "Visuals"); {
   }
 
-  ADD_TAB(vars::tabs["#panel"], "Misc"); {
+  ADD_TAB(vars::tabs["#tab_panel"], "Misc"); {
   }
 
-  ADD_TAB(vars::tabs["#panel"], "Colors"); {
+  ADD_TAB(vars::tabs["#tab_panel"], "Colors"); {
   }
 
-  ADD_TAB(vars::tabs["#panel"], "Settings"); {
+  ADD_TAB(vars::tabs["#tab_panel"], "Settings"); {
   }
 
   //

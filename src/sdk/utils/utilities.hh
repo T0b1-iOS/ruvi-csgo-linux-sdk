@@ -6,18 +6,16 @@
 
 // includes
 #include "../../core/interfaces/interfaces.hh"
+#include "../render/render.hh"
+#include "../structs/entities.hh"
 #include "../vector/vector.hh"
 #include <cmath>
 
 namespace utilities {
 
-inline void move_fix_start(c_user_cmd *cmd, qangle old_angle,
-                           float old_forward_move, float old_side_move) {
-
-  old_angle = cmd->view_angles;
-  old_forward_move = cmd->forward_move;
-  old_side_move = cmd->side_move;
-}
+struct esp_box_t {
+  int x, y, z, width, height;
+};
 
 inline void move_fix_end(c_user_cmd *cmd, qangle old_angle,
                          float old_forward_move, float old_side_move) {
@@ -64,4 +62,72 @@ inline vector3d rotate_point(vector3d point_to_rotate, int center_x,
            cos_theta * (point_to_rotate.y - center_y) + center_y),
           0.f};
 }
+
+inline bool create_box(entity_t *entity, esp_box_t &box) {
+
+  // get the entity origin (position)
+  vector3d origin = entity->m_vecOrigin();
+
+  // get entity dimensions
+  vector3d min = entity->m_vecMins() + origin;
+  vector3d max = entity->m_vecMaxs() + origin;
+
+  // points of a 3d bounding box
+  vector3d points[] = {
+      vector3d(min.x, min.y, min.z), vector3d(min.x, max.y, min.z),
+      vector3d(max.x, max.y, min.z), vector3d(max.x, min.y, min.z),
+      vector3d(max.x, max.y, max.z), vector3d(min.x, max.y, max.z),
+      vector3d(min.x, min.y, max.z), vector3d(max.x, min.y, max.z)};
+
+  // box dimensions
+  vector3d front_left_bottom, back_right_top, back_left_bottom, front_right_top,
+      front_right_bottom, back_right_bottom, back_left_top, front_left_top;
+
+  // get screen positions
+  if (!draw::world_to_screen(points[3], front_left_bottom) ||
+      !draw::world_to_screen(points[5], back_right_top) ||
+      !draw::world_to_screen(points[0], back_left_bottom) ||
+      !draw::world_to_screen(points[4], front_right_top) ||
+      !draw::world_to_screen(points[2], front_right_bottom) ||
+      !draw::world_to_screen(points[1], back_right_bottom) ||
+      !draw::world_to_screen(points[6], back_left_top) ||
+      !draw::world_to_screen(points[7], front_left_top)) {
+    return false;
+  }
+
+  // put everything on a array
+  vector3d box_array[] = {
+      front_left_bottom,  back_right_top,    back_left_bottom, front_right_top,
+      front_right_bottom, back_right_bottom, back_left_top,    front_left_top};
+
+  // initialize
+  int left = front_left_bottom.x;
+  int top = front_left_bottom.y;
+  int right = front_left_bottom.x;
+  int bottom = front_left_bottom.y;
+
+  // find the bounding corners for our box
+  for (std::size_t i = 1; i < 8; i++) {
+
+    if (left > box_array[i].x)
+      left = box_array[i].x;
+
+    if (bottom < box_array[i].y)
+      bottom = box_array[i].y;
+
+    if (right < box_array[i].x)
+      right = box_array[i].x;
+
+    if (top > box_array[i].y)
+      top = box_array[i].y;
+  }
+
+  box.x = static_cast<int>(left);
+  box.y =  static_cast<int>(top);
+  box.width = static_cast<int>((right - left));
+  box.height = static_cast<int>((bottom - top));
+
+  return true;
+}
+
 } // namespace utilities
