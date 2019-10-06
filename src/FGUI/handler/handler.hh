@@ -117,7 +117,7 @@ namespace fgui {
 		}
 
 		// handle the cursors
-		void draw_cursors();
+		static void draw_cursors();
 
 		// enable/disable the keyboard and mouse input
 		inline const void set_input_state(const fgui::input_state &input_state) noexcept {
