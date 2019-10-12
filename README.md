@@ -9,7 +9,7 @@ is a highly scalable CS:GO cheat base for **GNU/Linux**. It has some basic inter
 <br>
 
 ### Special thanks to:
- [@Vulgar1s](https://github.com/Vulgar1s), [@daansayajin](https://github.com/daansayajin) and [@cristeigabriel](https://github.com/cristeigabriel) for help with Ruvi development.
+[@daansayajin](https://github.com/daansayajin) and [@cristeigabriel](https://github.com/cristeigabriel) for helping with Ruvi development.
 
 <details>
 <summary>Screenshots</summary>
