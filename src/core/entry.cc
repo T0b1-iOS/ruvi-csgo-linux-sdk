@@ -50,7 +50,7 @@ int __attribute__((constructor)) startup() {
   return 0;
 }
 
-#endif
+#else
 
 bool is_mod_present(const std::wstring_view search_name)
 {
@@ -97,3 +97,5 @@ BOOL WINAPI DllMain(HINSTANCE instance, const DWORD reason, LPVOID reserved)
 
 	return TRUE;
 }
+
+#endif
