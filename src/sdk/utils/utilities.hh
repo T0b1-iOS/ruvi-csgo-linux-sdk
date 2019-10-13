@@ -9,6 +9,10 @@
 #include "../render/render.hh"
 #include "../structs/entities.hh"
 #include "../vector/vector.hh"
+#ifdef _WIN32
+#define _USE_MATH_DEFINES // def for M_PI
+#include <math.h>
+#endif
 #include <cmath>
 
 namespace utilities {

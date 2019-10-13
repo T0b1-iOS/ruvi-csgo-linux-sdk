@@ -7,7 +7,7 @@ public:
 	float real_time;
 	int frame_count;
 	float absolute_frametime;
-	float absolute_frame_start_timestd_dev;
+	float absolute_frame_start_time;
 	float cur_time;
 	float frame_time;
 	int max_clients;

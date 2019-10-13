@@ -6,6 +6,7 @@
 
 // includes
 #include "../memory/memory.hh"
+#include "sdk/indices.hh"
 
 class c_client_class;
 
@@ -88,15 +89,15 @@ enum cstrike15_user_message_t {
 class i_base_client_dll {
 public:
   c_client_class *get_all_classes() {
-    return memory::vfunc<8, c_client_class *>(this);
+    return memory::vfunc<idx::GET_ALL_CLASSES, c_client_class *>(this);
   }
 
   void view_fade(screen_fade_t *screen_fade) {
-    return memory::vfunc<29, void>(this, screen_fade);
+    return memory::vfunc<idx::VIEW_FADE, void>(this, screen_fade);
   }
 
   bool dispatch_user_message(int msg_type, unsigned int arg1,
                              unsigned int length, const void *data = nullptr) {
-    return memory::vfunc<38, bool>(this, msg_type, arg1, length, data);
+    return memory::vfunc<idx::DISPATCH_USER_MSG, bool>(this, msg_type, arg1, length, data);
   }
 };

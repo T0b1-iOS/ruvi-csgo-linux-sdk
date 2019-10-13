@@ -6,7 +6,9 @@
 
 // includes
 #include <array>
+#ifndef _WIN32
 #include <dlfcn.h>
+#endif
 #include <sstream>
 #include <string>
 
@@ -44,6 +46,7 @@ namespace interfaces {
 
 void on_entry_point();
 
+#ifndef _WIN32
 template <typename t> // this is not finished yet
 inline t *get_interface(const std::string &interface_location) {
 
@@ -102,6 +105,18 @@ inline t *get_interface(const std::string &interface_location) {
   
   return {};
 }
+#else
+
+uintptr_t get_interface_impl(const std::string& interface_location);
+
+template <typename t> // this is not finished yet
+inline t* get_interface(const std::string& interface_location)
+{
+	return reinterpret_cast<t*>(get_interface_impl(interface_location));
+}
+
+#endif
+
 } // namespace interfaces
 
 namespace csgo {

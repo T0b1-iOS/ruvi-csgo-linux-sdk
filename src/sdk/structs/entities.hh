@@ -9,6 +9,7 @@
 #include "../valve/iclientrenderable.hh"
 #include "../vector/matrix3x4.hh"
 #include "../vector/vector.hh"
+#include "sdk/indices.hh"
 
 enum cs_team_id_t {
   NONE = 0,
@@ -178,11 +179,11 @@ struct entity_t : public i_client_networkable,
   }
 
   inline vector3d get_abs_origin() {
-    return memory::vfunc<12, const vector3d &>(this);
+    return memory::vfunc<idx::GET_ABS_ORIGIN, const vector3d &>(this);
   }
 
   void set_model_index(int index) {
-    return memory::vfunc<111, void>(this, index);
+    return memory::vfunc<idx::SET_MDL_IDX, void>(this, index);
   }
 
   player_info_t get_entity_info() {

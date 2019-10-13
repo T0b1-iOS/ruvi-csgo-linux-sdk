@@ -8,6 +8,7 @@
 #include <functional>
 #include "../memory/memory.hh"
 #include "../utils/utlvector.hh"
+#include "sdk/indices.hh"
 
 class convar {
 private:
@@ -15,17 +16,17 @@ private:
                               float old_value);
 
 public:
-  float get_float() { return memory::vfunc<15, float>(this); }
+  float get_float() { return memory::vfunc<idx::CV_GET_FLOAT, float>(this); }
 
-  int get_int() { return memory::vfunc<16, int>(this); }
+  int get_int() { return memory::vfunc<idx::CV_GET_INT, int>(this); }
 
   void set_value(const char *value) {
-    return memory::vfunc<17, void>(this, value);
+    return memory::vfunc<idx::CV_SET_STR_VAL, void>(this, value);
   }
 
-  void set_value(float value) { return memory::vfunc<18, void>(this, value); }
+  void set_value(float value) { return memory::vfunc<idx::CV_SET_FL_VAL, void>(this, value); }
 
-  void set_value(int value) { return memory::vfunc<19, void>(this, value); }
+  void set_value(int value) { return memory::vfunc<idx::CV_SET_INT_VAL, void>(this, value); }
 
 public:
   char pad0[0x4];
@@ -51,15 +52,15 @@ public:
 class i_cvar {
 public:
   void register_con_command(convar *command) {
-    return memory::vfunc<10, void>(this, command);
+    return memory::vfunc<idx::CV_REG_CMD, void>(this, command);
   }
 
   void un_register_con_command(convar *command) {
-    return memory::vfunc<11, void>(this, command);
+    return memory::vfunc<idx::CV_UNREG_CMD, void>(this, command);
   }
 
   convar *find_var(const char *name) {
-    return memory::vfunc<15, convar *>(this, name);
+    return memory::vfunc<idx::CV_FIND_VAR, convar *>(this, name);
   }
 
   convar *spoof(convar *cvar, const std::string_view new_name) {
@@ -72,6 +73,6 @@ public:
   }
 
   void console_color_printf(const int color[4], const std::string_view message, ...) {
-    return memory::vfunc<25, void>(this, std::ref(color), message.data());
+    return memory::vfunc<idx::CV_CON_COL_PRINT, void>(this, std::ref(color), message.data());
   }
 };

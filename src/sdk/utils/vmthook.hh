@@ -70,7 +70,7 @@ public:
   }
 
   template <typename fn> void apply_hook(std::size_t index) {
-    fn::original = hook_function(&fn::hooked, index);
+    fn::original = reinterpret_cast<decltype(fn::original)>(hook_function(&fn::hooked, index));
   }
 
   template <typename fn = std::uintptr_t>

@@ -7,9 +7,18 @@
 #include "../../menu/menu.hh"
 #include "../../sdk/render/render.hh"
 #include "../../sdk/utils/utilities.hh"
+#include "sdk/indices.hh"
 
 // framework includes
 #include <FGUI/FGUI.hh>
+
+#ifdef _WIN32
+#define HOOK_CALL_CONV __fastcall
+#define HOOK_PAD_PARAM void*,
+#else
+#define HOOK_CALL_CONV
+#define HOOK_PAD_PARAM
+#endif
 
 std::unique_ptr<vmt_hook> engine_vgui_hook = std::make_unique<vmt_hook>();
 std::unique_ptr<vmt_hook> base_client_hook = std::make_unique<vmt_hook>();
@@ -26,30 +35,38 @@ hooks::frame_stage_notify::fn *hooks::frame_stage_notify::original;
 void hooks::on_entry_point() {
 
   if (engine_vgui_hook->initialize_and_hook_instance(csgo::engine_vgui))
-    engine_vgui_hook->apply_hook<hooks::paint>(15);
+    engine_vgui_hook->apply_hook<hooks::paint>(idx::PAINT);
 
   if (base_client_hook->initialize_and_hook_instance(csgo::base_client)) {
-    base_client_hook->apply_hook<hooks::in_key_event>(21);
-    base_client_hook->apply_hook<hooks::frame_stage_notify>(37);
+    base_client_hook->apply_hook<hooks::in_key_event>(idx::IN_KEY_EVENT);
+    base_client_hook->apply_hook<hooks::frame_stage_notify>(idx::FRAME_STAGE_NOTIFY);
   }
 
   if (vgui_surface_hook->initialize_and_hook_instance(csgo::vgui_surface))
-    vgui_surface_hook->apply_hook<hooks::lock_cursor>(67);
+    vgui_surface_hook->apply_hook<hooks::lock_cursor>(idx::LOCK_CURSOR);
 
   if (client_mode_hook->initialize_and_hook_instance(csgo::client_mode))
-    client_mode_hook->apply_hook<hooks::create_move>(25);
+    client_mode_hook->apply_hook<hooks::create_move>(idx::CREATE_MOVE);
 }
 
-void hooks::paint::hooked(void *thisptr, paint_mode_t mode) {
+void HOOK_CALL_CONV hooks::paint::hooked(void *thisptr, HOOK_PAD_PARAM paint_mode_t mode) {
 
   // call original function
   original(thisptr, mode);
 
+#ifndef _WIN32
   static void (*start_drawing)(void *) = reinterpret_cast<void (*)(void *)>(
       memory::find_pattern("vguimatsurface_client.so",
                            "55 48 89 E5 53 48 89 FB 48 83 EC 28 80 3D"));
   static void (*finish_drawing)(void *) = reinterpret_cast<void (*)(void *)>(
       memory::find_pattern("vguimatsurface_client.so", "55 31 FF 48 89 E5 53"));
+#else
+  static auto start_drawing = reinterpret_cast<void (__thiscall*)(void*)>(
+	  memory::find_pattern("vguimatsurface_client.so",
+		  "55 8B EC 83 E4 C0 83 EC 38"));
+  static auto finish_drawing = reinterpret_cast<void (__thiscall*)(void*)>(
+	  memory::find_pattern("vguimatsurface_client.so", "8B 0D ? ? ? ? 56 C6 05"));
+#endif
 
   if (mode & paint_mode_t::PAINT_UIPANELS) {
 
@@ -68,7 +85,7 @@ void hooks::paint::hooked(void *thisptr, paint_mode_t mode) {
   }
 }
 
-int hooks::in_key_event::hooked(void *thisptr, int event_code, int key_num,
+int HOOK_CALL_CONV hooks::in_key_event::hooked(void *thisptr, HOOK_PAD_PARAM int event_code, int key_num,
                                 const char *current_binding) {
 
   if (vars::container["#window"]->get_state())
@@ -78,7 +95,7 @@ int hooks::in_key_event::hooked(void *thisptr, int event_code, int key_num,
   return original(thisptr, event_code, key_num, current_binding);
 }
 
-void hooks::lock_cursor::hooked(void *thisptr) {
+void HOOK_CALL_CONV hooks::lock_cursor::hooked(void *thisptr) {
 
   if (vars::container["#window"]->get_state()) {
 
@@ -92,7 +109,7 @@ void hooks::lock_cursor::hooked(void *thisptr) {
   original(thisptr);
 }
 
-bool hooks::create_move::hooked(void *thisptr, float sample_time,
+bool HOOK_CALL_CONV hooks::create_move::hooked(void *thisptr, HOOK_PAD_PARAM float sample_time,
                                 c_user_cmd *cmd) {
 
   if (!cmd || !cmd->command_number)
@@ -112,7 +129,7 @@ bool hooks::create_move::hooked(void *thisptr, float sample_time,
   return false;
 }
 
-void hooks::frame_stage_notify::hooked(void *thisptr,
+void HOOK_CALL_CONV hooks::frame_stage_notify::hooked(void *thisptr, HOOK_PAD_PARAM
                                        client_frame_stage_t stage) {
 
   // call original function

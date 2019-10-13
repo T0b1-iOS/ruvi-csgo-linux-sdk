@@ -7,6 +7,7 @@
 // includes
 #include "../memory/memory.hh"
 #include "../netvars/netvars.hh"
+#include "sdk/indices.hh"
 
 class i_texture;
 class i_material;
@@ -127,43 +128,43 @@ enum render_target_flags_t {
 
 class i_material_system {
 public:
-  OFFSET_PTR(bool, m_bGameStarted, 0x32A8)
+  OFFSET_PTR(bool, m_bGameStarted, offsets::MAT_GAME_STARTED)
 
   image_format_t get_back_buffer_format() {
-    return memory::vfunc<36, image_format_t>(this);
+    return memory::vfunc<idx::MAT_BB_FMT, image_format_t>(this);
   }
 
   i_material *create_material(const char *p_material_name, void *key_values) {
-    return memory::vfunc<83, i_material *>(this, p_material_name, key_values);
+    return memory::vfunc<idx::MAT_CREATE_MAT, i_material *>(this, p_material_name, key_values);
   }
 
   i_material *find_material(char const *p_material_name,
                             const char *p_texture_group, bool complain = true,
                             const char *p_complain_prefix = nullptr) {
-    return memory::vfunc<84, i_material *>(
+    return memory::vfunc<idx::MAT_FIND_MAT, i_material *>(
         this, p_material_name, p_texture_group, complain, p_complain_prefix);
   }
 
   i_material *get_material(material_handle_t handle) {
-    return memory::vfunc<89, i_material *>(this, handle);
+    return memory::vfunc<idx::MAT_GET_MAT, i_material *>(this, handle);
   }
 
   void begin_render_target_allocation() {
-    return memory::vfunc<94, void>(this);
+    return memory::vfunc<idx::MAT_BEGIN_RT_ALLOC, void>(this);
   }
 
-  void end_render_target_allocation() { return memory::vfunc<95, void>(this); }
+  void end_render_target_allocation() { return memory::vfunc<idx::MAT_END_RT_ALLOC, void>(this); }
 
   i_texture *create_named_render_target_texture_ex(
       const char *name, int w, int h, int size_mode, int format, int depth,
       unsigned int texture_flags, unsigned int render_target_flags) {
-    return memory::vfunc<97, i_texture *>(this, name, w, h, size_mode, format,
+    return memory::vfunc<idx::MAT_CREATE_NAMED_RT, i_texture *>(this, name, w, h, size_mode, format,
                                           depth, texture_flags,
                                           render_target_flags);
   }
 
   i_mat_render_context *get_render_context() {
-    return memory::vfunc<115, i_mat_render_context *>(this);
+    return memory::vfunc<idx::MAT_GET_CTX, i_mat_render_context *>(this);
   }
 
   i_texture *create_full_frame_render_target(const char *name) {

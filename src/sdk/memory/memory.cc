@@ -5,11 +5,35 @@
 // includes
 #include "memory.hh"
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <string>
+#include <string_view>
+#include <windows.h>
+#include <winternl.h>
+#endif
+
 struct dlinfo_t {
 
   std::size_t size = 0;
   std::uintptr_t address = 0;
+#ifndef _WIN32
   const char *library = nullptr;
+#else
+    struct str_holder
+    {
+        str_holder(char* str) : _str(str) {}
+
+		operator const char*() const { return _str.c_str(); }
+
+		std::string_view str() const { return _str; }
+
+    protected:
+		std::string _str = nullptr;
+    };
+	str_holder library;
+#endif
 };
 
 std::vector<dlinfo_t> libraries;
@@ -26,6 +50,7 @@ inline bool compare(const unsigned char *data, const unsigned char *mask,
   return (*mask_2) == 0;
 }
 
+#ifndef _WIN32
 bool get_library_info(const char *library, std::uintptr_t *address,
                       std::size_t *size) {
 
@@ -62,6 +87,62 @@ bool get_library_info(const char *library, std::uintptr_t *address,
 
   return false;
 }
+#else
+
+bool get_library_info(const char* library, std::uintptr_t* address,
+	std::size_t* size) {
+
+    if(libraries.empty(  ))
+    {
+		const auto peb = reinterpret_cast<PPEB>(__readfsdword(0x30));
+
+		if (!peb)
+			return false; // should never happen though
+
+		auto ldr_mod = reinterpret_cast<PLDR_DATA_TABLE_ENTRY>(peb->Ldr->InMemoryOrderModuleList.Flink);
+		for (; ldr_mod->Reserved2[0]; ldr_mod = reinterpret_cast<PLDR_DATA_TABLE_ENTRY>(reinterpret_cast<PLIST_ENTRY32>(ldr_mod)->Flink))
+		{
+		    const auto mod_name = std::wstring_view{ ldr_mod->FullDllName.Buffer };
+			const auto name_buf = reinterpret_cast<char*>(_alloca(mod_name.size()+1));
+
+            if(!WideCharToMultiByte(CP_ACP, 0, mod_name.data(  ), mod_name.size(  ),
+				name_buf, mod_name.size(  ), nullptr, nullptr))
+				continue;
+
+			name_buf[mod_name.size()] = '\0';
+			const auto dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(ldr_mod->Reserved2[0]);
+			const auto nt_header = reinterpret_cast<PIMAGE_NT_HEADERS32>(reinterpret_cast<uintptr_t>(ldr_mod->Reserved2[0]) + dos_header->e_lfanew);
+
+			libraries.emplace_back(dlinfo_t{ nt_header->OptionalHeader.SizeOfImage, reinterpret_cast<uintptr_t>(ldr_mod->Reserved2[0]), name_buf });
+		}
+    }
+
+    // so this runs under the assumption that <linux_mod_name> = <windows_mod_name>_client.so
+    // and yes im stupid...
+	auto name_view = std::string_view{ library };
+	name_view = name_view.substr(0, name_view.length() - 10u);
+	for (const dlinfo_t& current : libraries) {
+
+		const auto cur_name = current.library.str();
+		if (cur_name.length() < name_view.length())
+			continue;
+
+		if (cur_name.substr(0, name_view.length(  )) != name_view)
+			continue;
+
+		if (address)
+			*address = current.address;
+
+		if (size)
+			*size = current.size;
+
+		return true;
+	}
+
+	return false;
+}
+
+#endif
 
 std::uint8_t *memory::find_pattern(const char *module, const char *signature) {
 

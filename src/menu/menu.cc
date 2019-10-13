@@ -5,6 +5,12 @@
 // includes
 #include "menu.hh"
 
+#ifdef _WIN32
+#define WINDOW_TITLE "Ruvi for Counter-Strike: Global Offensive(Win32 Edition)"
+#else
+#define WINDOW_TITLE "Ruvi for Counter-Strike: Global Offensive"
+#endif
+
 void menu::on_entry_point() {
 
   // default fonts
@@ -15,7 +21,7 @@ void menu::on_entry_point() {
   REGISTER_NOTIFICATIONS(title_font);
 
   // initialize the main window
-  ADD_WINDOW(vars::container["#window"], 50, 50, "Ruvi for Counter-Strike: Global Offensive", 560, 450, fgui::external::key_code::KEY_HOME, title_font);
+  ADD_WINDOW(vars::container["#window"], 50, 50, WINDOW_TITLE, 560, 450, fgui::external::key_code::KEY_HOME, title_font);
 
   // initialize the input system
   REGISTER_CURSOR(fgui::cursor_type::ARROW, fgui::input_state::UNLOCKED);

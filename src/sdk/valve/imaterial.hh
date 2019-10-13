@@ -6,7 +6,7 @@
 
 // includes
 #include "../memory/memory.hh"
-#include <string>
+#include "sdk/indices.hh"
 
 enum material_flags_t {
 
@@ -43,23 +43,23 @@ enum material_flags_t {
 
 class i_material {
 public:
-  const char *get_name() { return memory::vfunc<0, const char *>(this); }
+  const char *get_name() { return memory::vfunc<idx::MAT_GET_NAME, const char *>(this); }
 
   const char *get_texture_group_name() {
-    return memory::vfunc<1, const char *>(this);
+    return memory::vfunc<idx::MAT_TEX_GRP_NAME, const char *>(this);
   }
 
-  void increment_reference_count() { return memory::vfunc<4, void>(this); }
+  void increment_reference_count() { return memory::vfunc<idx::MAT_INC_REF, void>(this); }
 
   void alpha_modulate(float alpha) {
-    return memory::vfunc<27, void>(this, alpha);
+    return memory::vfunc<idx::MAT_ALPHA_MOD, void>(this, alpha);
   }
 
   void color_modulate(float red, float green, float blue) {
-    return memory::vfunc<28, void>(this, red, green, blue);
+    return memory::vfunc<idx::MAT_COL_MOD, void>(this, red, green, blue);
   }
 
   void set_material_flag(material_flags_t flag, bool onoff) {
-    return memory::vfunc<29, void>(this, flag, onoff);
+    return memory::vfunc<idx::MAT_SET_MAT_FLAG, void>(this, flag, onoff);
   }
 };

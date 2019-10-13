@@ -5,6 +5,7 @@
 // includes
 #include "../memory/memory.hh"
 #include "../vector/vector.hh"
+#include "sdk/indices.hh"
 
 class c_client_class;
 
@@ -12,17 +13,17 @@ class i_client_networkable {
 public:
   virtual ~i_client_networkable(){};
 
-  void release() { return memory::vfunc<1, void>(this); }
+  void release() { return memory::vfunc<idx::NETWORKABLE_RELEASE, void>(this); }
 
   c_client_class *get_client_class() {
-    return memory::vfunc<2, c_client_class *>(this);
+    return memory::vfunc<idx::GET_CLIENT_CLASS, c_client_class *>(this);
   }
 
-  bool is_dormant() { return memory::vfunc<9, bool>(this); }
+  bool is_dormant() { return memory::vfunc<idx::IS_DORMANT, bool>(this); }
 
-  int get_index() { return memory::vfunc<10, int>(this); }
+  int get_index() { return memory::vfunc<idx::GET_INDEX, int>(this); }
 
   void set_destroyed_on_recreate_entities() {
-    return memory::vfunc<13, void>(this);
+    return memory::vfunc<idx::SET_DESTROYED_ON_REC_ENT, void>(this);
   }
 };

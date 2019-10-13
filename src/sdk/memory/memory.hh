@@ -7,10 +7,18 @@
 // includes
 #include <cstdint>
 #include <cstdlib>
+#ifndef _WIN32
 #include <link.h>
+#endif
 #include <memory.h>
 #include <string.h>
 #include <vector>
+
+#ifdef _WIN32
+#define VFUNC_CALL_CONV __thiscall
+#else
+#define VFUNC_CALL_CONV
+#endif
 
 namespace memory {
 
@@ -18,7 +26,7 @@ std::uint8_t *find_pattern(const char *module, const char *signature);
 
 template <unsigned int index, typename type, typename... arguments>
 static type vfunc(void *thisptr, arguments... argument_list) {
-  using fn = type (*)(void *, decltype(argument_list)...);
+  using fn = type (VFUNC_CALL_CONV *)(void *, decltype(argument_list)...);
   return (*static_cast<fn **>(thisptr))[index](thisptr, argument_list...);
 }
 

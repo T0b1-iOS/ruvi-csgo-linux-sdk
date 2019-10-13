@@ -55,6 +55,9 @@ public:
     void *p_data;
     float data_vector[3];
   };
+#ifdef _WIN32
+  int type;
+#endif
 };
 
 struct recv_proxy_data_t {

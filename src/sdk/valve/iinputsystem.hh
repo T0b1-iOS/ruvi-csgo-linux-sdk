@@ -6,6 +6,7 @@
 
 // includes
 #include "sdk/memory/memory.hh"
+#include "sdk/indices.hh"
 
 enum analog_code_t {
   ANALOG_CODE_INVALID = -1,
@@ -18,17 +19,17 @@ enum analog_code_t {
 
 class i_input_system {
 public:
-  bool is_button_down(int code) { return memory::vfunc<15, bool>(this, code); }
+  bool is_button_down(int code) { return memory::vfunc<idx::INPUT_BTN_DOWN, bool>(this, code); }
 
   int get_analog_value(analog_code_t code) {
-    return memory::vfunc<18, int>(this, code);
+    return memory::vfunc<idx::INPUT_ANALOG_VAL, int>(this, code);
   }
 
   int get_analog_delta(analog_code_t code) {
-    return memory::vfunc<19, int>(this, code);
+    return memory::vfunc<idx::INPUT_ANALOG_DELTA, int>(this, code);
   }
 
   const char *button_code_to_string(int code) {
-    return memory::vfunc<40, const char *>(this, code);
+    return memory::vfunc<idx::INPUT_BTN_CODE_STR, const char *>(this, code);
   }
 };
