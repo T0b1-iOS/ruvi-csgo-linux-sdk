@@ -1,0 +1,3 @@
+[submodule "src/FGUI"]
+	path = src/FGUI
+	url = https://github.com/T0b1-iOS/fgui.git
